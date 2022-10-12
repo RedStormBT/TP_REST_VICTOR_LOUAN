@@ -1,0 +1,140 @@
+---
+
+openapi: 3.0.0
+info:
+  title: User API
+  description: This is the API of the User service
+  contact:
+    email: louan.belicaud@imt-atlantique.net
+  license:
+    name: GPL v3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/UE-archi-distribuees/User/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: https://virtserver.swaggerhub.com/UE-archi-distribuees/Booking/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+      - developers
+      summary: home page of the service
+      description: |
+        Nothing to do
+      operationId: home
+      responses:
+        "200":
+          description: welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Test</h1>
+  /user/bookings:
+    get:
+      tags:
+      - developers
+      summary: get the reservation of an user using is id or name
+      description: |
+        get the reservation of an user using is id or name
+      operationId: get_booking_from_username_or_userid
+      parameters:
+      - name: name
+        in: query
+        description: string
+        explode: false
+        schema:
+          maximum: 1
+          minimum: 1
+          type: string
+      - name: id
+        in: query
+        description: string
+        explode: false
+        schema:
+          maximum: 1
+          minimum: 1
+          type: string
+      responses:
+        "200":
+          description: bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookings'
+        "400":
+          description: User not found or no argument passed or user has no reservation
+  /user/booking/details/{userid}:
+    get:
+      tags:
+        - developers
+      summary: get details about the reservations on an user (details on movies)
+      operationId: get_user_bookings_infos
+      description: |
+        get details about the reservations on an user (details on movies)
+      parameters:
+        - name: userid
+          in: path
+          description: string
+          required: true
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetailed'
+        "400":
+          description: User not found or no argument passed or user has no reservation
+components:
+  schemas:
+    Bookings:
+      required:
+      - dates
+      type: object
+      properties:
+        dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        userid:
+          type: string
+          example: "dwight_schrute"
+    Booking:
+      required:
+        - date
+        - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20151202"
+        movies:
+          type: array
+          items:
+            type: string
+            example: ["7daf7208-be4d-4944-a3ae-c1c2f516f3e6", "7daf7208-be4d-4944-a3ae-c1c2f516f3e6"]
+    BookingDetailed:
+      required:
+        - date
+        - MovieID
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20150901"
+        movie:
+          type: object
+          $ref: '#/components/schemas/MovieID'
